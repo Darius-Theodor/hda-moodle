@@ -107,7 +107,7 @@ Befehle:
   news [kurs ...]     Ankündigungen aus dem Manifest zeigen.
   deadlines           Anstehende Moodle-Termine (Abgaben, Tests) aus dem Moodle-Kalender.
 
-Kurs-Kürzel und Zielordner stehen in courses.json neben diesem Script. Manifest und
+Kurs-Kürzel und Zielordner stehen in <projekt>/tools/moodle/courses.json (Projekt = $HDA_ROOT oder cwd). Manifest und
 Dateien liegen unter <kursordner>/moodle/. Token widerrufen: Moodle → Profil →
 Sicherheitsschlüssel; lokal löschen: security delete-generic-password -s hda-moodle-token
 """
@@ -127,9 +127,11 @@ from pathlib import Path
 MOODLE_URL = "https://lernen.h-da.de"
 SERVICE = "moodle_mobile_app"
 KEYCHAIN_SERVICE = "hda-moodle-token"
-HERE = Path(__file__).resolve().parent
-ROOT = HERE.parent.parent
-COURSES = json.loads((HERE / "courses.json").read_text())
+# Projektordner: Umgebungsvariable HDA_ROOT oder das aktuelle Arbeitsverzeichnis.
+# Dort liegen tools/moodle/courses.json und die Kursordner.
+ROOT = Path(os.environ.get("HDA_ROOT", os.getcwd())).resolve()
+CONF = ROOT / "tools" / "moodle" / "courses.json"
+COURSES = json.loads(CONF.read_text()) if CONF.exists() else {}
 
 
 # --- Schlüsselbund -----------------------------------------------------------
